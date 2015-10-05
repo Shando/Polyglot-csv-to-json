@@ -1,0 +1,8 @@
+
+Please check the example file to see how the library is being used.
+
+Include the <csv_parser/csv_parser.hpp> header file and then compile the source as follows:
+
+g++ -Wall -O2 -g `csv_parser-config --cxxflags --libs` example.cpp -o example 
+
+
