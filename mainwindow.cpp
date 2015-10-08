@@ -8,8 +8,8 @@
 #include <wchar.h>
 #ifdef __APPLE__
         #include <sys/uio.h>
-#else
-        #include <sys/io.h>
+//#else
+//        #include <sys/io.h>
 #endif
 #include <fcntl.h>
 

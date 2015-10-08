@@ -1,5 +1,16 @@
 <RCC>
     <qresource prefix="/">
         <file>images/parrot_tiny.PNG</file>
+        <file>images/polyglot.ico</file>
+        <file>images/polyglot_16.icns</file>
+        <file>images/polyglot_16.png</file>
+        <file>images/polyglot_32.icns</file>
+        <file>images/polyglot_32.png</file>
+        <file>images/polyglot_48.icns</file>
+        <file>images/polyglot_48.png</file>
+        <file>images/polyglot_64.png</file>
+        <file>images/polyglot_96.png</file>
+        <file>images/polyglot_128.icns</file>
+        <file>images/polyglot_128.png</file>
     </qresource>
 </RCC>
