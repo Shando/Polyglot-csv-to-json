@@ -20,9 +20,14 @@ private slots:
     void on_btnLoadCSV_clicked();
     void on_btnConvert_clicked();
 
+    void on_rdoXML_toggled(bool checked);
+
+    void on_rdoJSON_toggled(bool checked);
+
 private:
     Ui::MainWindow *ui;
     QString fileName;
+    bool bJSON;
 };
 
 #endif // MAINWINDOW_H

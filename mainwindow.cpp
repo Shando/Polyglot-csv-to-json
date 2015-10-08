@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    bJSON = true;
 }
 
 MainWindow::~MainWindow()
@@ -38,7 +39,12 @@ void MainWindow::on_btnLoadCSV_clicked()
     if ( fileName != "" ) {
         ui->btnConvert->setEnabled(true);
         ui->txtFile->setText(fileName);
-        ui->txtConversion->setText("Press the \"Convert to JSON\" Button to create a JSON file with\nthe same name, and in the same location, as the selected file.");
+
+        if ( bJSON ) {
+            ui->txtConversion->setText("Press the \"Convert\" Button to create a JSON file with\nthe same name, and in the same location, as the selected file.");
+        } else {
+            ui->txtConversion->setText("Press the \"Convert\" Button to create an XML file with\nthe same name, and in the same location, as the selected file.");
+        }
     }
 }
 
@@ -107,70 +113,158 @@ void MainWindow::on_btnConvert_clicked()
     }
 
     QString strOut = fileName.left(fileName.length() - 3);
-    strOut = strOut + "json";
 
-    ofstream myfile (strOut.toUtf8());
+    if ( bJSON ) {
+        strOut = strOut + "json";
 
-    if (myfile.is_open()) {
-        strOut = "{ \"polyglot\": [\n";
-        myfile << strOut.toStdString();
+        ofstream myfile (strOut.toUtf8());
 
-        for (int x = 2; x < row_width; x++) {
-            strOut = "\t{\t\"lang_code\": \"" + myArray[x][1].toUtf8() + "\",\n";
-            strOut.simplified();
-            myfile << strOut.toStdString();
-            strOut = "\t\t\"lang_name_en\": \"" + myArray[x][2].toUtf8() + "\",\n";
-            strOut.simplified();
-            myfile << strOut.toStdString();
-            strOut = "\t\t\"lang_direction\": \"" + myArray[x][3].toUtf8() + "\",\n";
-            strOut.simplified();
-            myfile << strOut.toStdString();
-            strOut = "\t\t\"codes\": [\n";
+        if (myfile.is_open()) {
+            strOut = "{ \"polyglot\": [\n";
             myfile << strOut.toStdString();
 
-            for (int y = 6; y < row_count; y++) {
-                strOut = "\t\t\t{\t\"code\": \"" + myArray2[1][y].toUtf8() + "\",\n";
+            for (int x = 2; x < row_width; x++) {
+                strOut = "\t{\t\"lang_code\": \"" + myArray[x][1].toUtf8() + "\",\n";
                 strOut.simplified();
                 myfile << strOut.toStdString();
-                strOut = "\t\t\t\t\"comment\": \"" + myArray2[2][y].toUtf8() + "\",\n";
+                strOut = "\t\t\"lang_name_en\": \"" + myArray[x][2].toUtf8() + "\",\n";
                 strOut.simplified();
                 myfile << strOut.toStdString();
-                strOut = "\t\t\t\t\"translation\": \"" + myArray[x][y].toUtf8() + "\"\n";
+                strOut = "\t\t\"lang_direction\": \"" + myArray[x][3].toUtf8() + "\",\n";
+                strOut.simplified();
+                myfile << strOut.toStdString();
+                strOut = "\t\t\"codes\": [\n";
+                myfile << strOut.toStdString();
+
+                for (int y = 6; y < row_count; y++) {
+                    strOut = "\t\t\t{\t\"code\": \"" + myArray2[1][y].toUtf8() + "\",\n";
+                    strOut.simplified();
+                    myfile << strOut.toStdString();
+                    strOut = "\t\t\t\t\"comment\": \"" + myArray2[2][y].toUtf8() + "\",\n";
+                    strOut.simplified();
+                    myfile << strOut.toStdString();
+                    strOut = "\t\t\t\t\"translation\": \"" + myArray[x][y].toUtf8() + "\"\n";
+                    strOut.simplified();
+                    myfile << strOut.toStdString();
+
+                    if ( y == row_count - 1 && x != row_width - 1) {
+                        strOut = "\t\t\t}\n";
+                        myfile << strOut.toStdString();
+                        strOut = "\t\t]\n";
+                        myfile << strOut.toStdString();
+                        strOut = "\t},\n";
+                        myfile << strOut.toStdString();
+                    } else if (y == row_count - 1 && x == row_width - 1) {
+                        strOut = "\t\t\t}\n";
+                        myfile << strOut.toStdString();
+                        strOut = "\t\t]\n";
+                        myfile << strOut.toStdString();
+                        strOut = "\t}\n";
+                        myfile << strOut.toStdString();
+                        strOut = "\t]\n";
+                        myfile << strOut.toStdString();
+                    } else {
+                        strOut = "\t\t\t},\n";
+                        myfile << strOut.toStdString();
+                    }
+                }
+                myfile.flush();
+            }
+
+            strOut = "}";
+            myfile << strOut.toStdString();
+            myfile.close();
+        } else {
+            strOut = "";
+            ui->txtFile->setText("JSON Conversion Failed! Unable to Open File for Writing.");
+        }
+    } else {
+        strOut = strOut + "xml";
+
+        ofstream myfile (strOut.toUtf8());
+
+        if (myfile.is_open()) {
+            strOut = "<?xml version = \"1.0\" encoding = \"UTF-8\" ?>\n";
+            myfile << strOut.toStdString();
+
+            strOut = "<root>\n";
+            myfile << strOut.toStdString();
+
+            strOut = "\t<polyglot>\n";
+            myfile << strOut.toStdString();
+
+            for (int x = 2; x < row_width; x++) {
+                strOut = "\t\t<lang_code>" + myArray[x][1].toUtf8() + "</lang_code>\n";
+                strOut.simplified();
+                myfile << strOut.toStdString();
+                strOut = "\t\t<lang_name_en>" + myArray[x][2].toUtf8() + "</lang_name_en>\n";
+                strOut.simplified();
+                myfile << strOut.toStdString();
+                strOut = "\t\t<lang_direction>" + myArray[x][3].toUtf8() + "</lang_direction>\n";
                 strOut.simplified();
                 myfile << strOut.toStdString();
 
-                if ( y == row_count - 1 && x != row_width - 1) {
-                    strOut = "\t\t\t}\n";
+                for (int y = 6; y < row_count; y++) {
+                    strOut = "\t\t<codes>\n";
                     myfile << strOut.toStdString();
-                    strOut = "\t\t]\n";
+                    strOut = "\t\t\t<code>" + myArray2[1][y].toUtf8() + "</code>\n";
+                    strOut.simplified();
                     myfile << strOut.toStdString();
-                    strOut = "\t},\n";
+                    strOut = "\t\t\t<comment>" + myArray2[2][y].toUtf8() + "</comment>\n";
+                    strOut.simplified();
                     myfile << strOut.toStdString();
-                } else if (y == row_count - 1 && x == row_width - 1) {
-                    strOut = "\t\t\t}\n";
+                    strOut = "\t\t\t<translation>" + myArray[x][y].toUtf8() + "</translation>\n";
+                    strOut.simplified();
                     myfile << strOut.toStdString();
-                    strOut = "\t\t]\n";
+                    strOut = "\t\t</codes>\n";
                     myfile << strOut.toStdString();
-                    strOut = "\t}\n";
-                    myfile << strOut.toStdString();
-                    strOut = "\t]\n";
-                    myfile << strOut.toStdString();
-                } else {
-                    strOut = "\t\t\t},\n";
+                }
+
+                myfile.flush();
+
+                strOut = "\t</polyglot>\n";
+                myfile << strOut.toStdString();
+
+                if ( x < row_width - 1 ) {
+                    strOut = "\t<polyglot>\n";
                     myfile << strOut.toStdString();
                 }
             }
-            myfile.flush();
+
+            strOut = "</root>";
+            myfile << strOut.toStdString();
+            myfile.close();
+        } else {
+            strOut = "";
+            ui->txtFile->setText("XML Conversion Failed! Unable to Open File for Writing.");
         }
-
-        strOut = "}";
-        myfile << strOut.toStdString();
-        myfile.close();
-
-        ui->btnConvert->setEnabled(false);
-        ui->txtFile->setText("Conversion Successful. Please select another file to convert.");
-        ui->txtConversion->setText("");
-    } else {
-        cout << "Unable to open file";
     }
+
+    if ( !strOut.isEmpty() ) {
+        ui->btnConvert->setEnabled(false);
+
+        if ( bJSON ) {
+            ui->txtFile->setText("JSON Conversion Successful. Please select another file to convert.");
+        } else {
+            ui->txtFile->setText("XML Conversion Successful. Please select another file to convert.");
+        }
+        ui->txtConversion->setText("");
+    }
+}
+
+void MainWindow::on_rdoXML_toggled(bool checked)
+{
+    if ( checked ) {
+        ui->txtConversion->setText("Press the \"Convert\" Button to create an XML file with\nthe same name, and in the same location, as the selected file.");
+        bJSON = false;
+    }
+}
+
+void MainWindow::on_rdoJSON_toggled(bool checked)
+{
+    if ( checked ) {
+        ui->txtConversion->setText("Press the \"Convert\" Button to create a JSON file with\nthe same name, and in the same location, as the selected file.");
+        bJSON = true;
+    }
+
 }
